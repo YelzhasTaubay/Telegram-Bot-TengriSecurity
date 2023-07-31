@@ -1,12 +1,17 @@
 const mongoose = require("mongoose");
 
+// const UserStatus = {
+//     INITIAL: "INITIAL",
+//     PASSED: "PASSED",
+//     FAILED: "FAILED",
+// }
 
 const userSchema = mongoose.Schema(
     {
         tgUid: {
-           type: String,
-           required: true,
-           unique: true,
+            type: String,
+            required: true,
+            unique: true,
         },
         userName: {
             type: String,
@@ -26,6 +31,10 @@ const userSchema = mongoose.Schema(
             type: String,
             required: false,
             trim: true,
+        },
+        status: {
+            type: String,
+            required: false,
         }
     },
     {

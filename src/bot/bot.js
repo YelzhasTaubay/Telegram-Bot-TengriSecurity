@@ -4,9 +4,9 @@ const config = require("../config/config");
 const bot = new Bot(config.bot);
 
 bot.api.setMyCommands([
-    { command: "start", description: "Start the bot" },
-    { command: "help", description: "Show help text" },
-    { command: "apply", description: "Open settings" },
+    { command: "start", description: "Запуск бота" },
+    { command: "help", description: "Помощь" },
+    { command: "apply", description: "Вступить в группу" },
 ]);
 module.exports = bot;
 

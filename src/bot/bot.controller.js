@@ -1,18 +1,33 @@
 const {userService} = require("../services");
 const bot = require('./bot');
 
+function checkUserStatus(user, userName) {
+    const user_id = user._id;
+    const test_link = `http://127.0.0.1:4200/test/${user_id}`;
+    let message_test = "";
+    if (user.status === "INITIAL") {
+        message_test = ` <i>${userName}</i>, Добро пожаловать в Tengri Securities! \nВот ваша ссылка на тест:  <a href="${test_link}">Пройти тест</a>`;
+    } else if (user.status === "PASSED") {
+        message_test = `<i>${userName}</i>, вы уже успешно прошли тестирование!`
+    } else if (user.status === "FAILED") {
+        message_test = `<i>${userName}</i>, к сожалению вы не прошли тестирование, свяжитесь с менеджером`
+    }
+    return message_test;
+}
 
 const start = bot.command("start", async (ctx) => {
-    console.log(ctx.message);
     const userRequest = {
         tgUid: ctx.from.id,
         userName: ctx.from.username,
+        status: "INITIAL",
     };
-    const user = await userService.getUserByTgUid(userRequest.tgUid);
+    let user = await userService.getUserByTgUid(userRequest.tgUid);
     if (!user) {
-        await userService.createUser(userRequest);
+        user = await userService.createUser(userRequest);
     }
-    await ctx.api.sendMessage(ctx.chat.id, `Hey ${ctx.chat.first_name}`);
+    const message = checkUserStatus(user, ctx.from.first_name);
+
+    await ctx.api.sendMessage(ctx.chat.id, message, {parse_mode: "HTML"});
 });
 
 const help = bot.command("help", async (ctx) => {
