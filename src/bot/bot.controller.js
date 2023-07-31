@@ -1,4 +1,6 @@
-const {userService} = require("../services");
+const {userService, orderService} = require("../services");
+const {subscriptionService} = require("../services")
+const {channelService} = require("../services")
 const bot = require('./bot');
 
 function checkUserStatus(user, userName) {
@@ -36,8 +38,43 @@ const help = bot.command("help", async (ctx) => {
 });
 
 const apply = bot.command("apply", async (ctx) => {
-    console.log(ctx.message);
-    await ctx.api.sendMessage(ctx.chat.id, `Hey ${ctx.chat.first_name}`);
+    let user = await userService.getUserByTgUid(ctx.from.id);
+    if (user.status !== "PASSED") {
+        await ctx.api.sendMessage(ctx.chat.id, `${ctx.chat.first_name}, к сожалению вы еще не прошли тест`);
+    } else {
+        //TODO Example how to create channel
+        // const channelRequest = {
+        //     name: "Tengri Signals",
+        //     link: "link to channel",
+        // };
+        //todo set channel id to env;
+        const channel = await channelService.getChannelById("64c7c9ce53bd044db03c30b0");
+        // const channel = await channelService.createChannel(channelRequest);
+        let subscription = await subscriptionService.getSubscriptionByUserIdAndChannelId(user, channel);
+        if (!subscription) {
+            const subscriptionRequest = {
+                user: user,
+                startDate: new Date(),
+                endDate: new Date(),
+                isActive: false,
+                channel: channel,
+            }
+            subscription = await subscriptionService.createSubscription(subscriptionRequest);
+            const orderRequest = {
+                user: user,
+                amount: 20000,
+                status: "INITIAL",
+                days: 30,
+                subscription: subscription
+            }
+            const order = await orderService.createOrder(orderRequest);
+            console.log(order)
+            await ctx.api.sendMessage(ctx.chat.id, `Вы успешно создали запрос на подписку, менеджер с вами скоро свяжется`);
+        } else {
+            await ctx.api.sendMessage(ctx.chat.id, `${ctx.chat.first_name}, Вы уже оформили подписку`);
+        }
+        console.log(subscription);
+    }
 });
 
 const message = bot.on("message", async (ctx) => {

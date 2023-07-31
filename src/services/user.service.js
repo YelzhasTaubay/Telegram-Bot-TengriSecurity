@@ -11,7 +11,7 @@ const createUser = async (userBody) => {
 
 const getUserById = async (id) => {
     const user = await User.findById(id);
-    return User.findById(id);
+    return user;
 };
 
 const getUserByTgUid = async (tgUid) => {

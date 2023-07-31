@@ -1,11 +1,5 @@
 const mongoose = require("mongoose");
 
-// const UserStatus = {
-//     INITIAL: "INITIAL",
-//     PASSED: "PASSED",
-//     FAILED: "FAILED",
-// }
-
 const userSchema = mongoose.Schema(
     {
         tgUid: {
@@ -34,7 +28,9 @@ const userSchema = mongoose.Schema(
         },
         status: {
             type: String,
+            enum: ["INITIAL", "PASSED", "FAILED"],
             required: false,
+            default: "INITIAL",
         }
     },
     {
